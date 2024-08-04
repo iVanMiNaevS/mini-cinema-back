@@ -1,4 +1,5 @@
 require("dotenv").config();
+const userController = require("./controllers/UserController.js");
 const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
@@ -13,9 +14,7 @@ mongoose
 		console.log(err);
 	});
 
-app.get("/", (req, res) => {
-	res.send("Hello World!");
-});
+app.get("/registration", userController.registration);
 
 app.listen(port, () => {
 	console.log(`app listening on port ${port}`);
