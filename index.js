@@ -18,6 +18,7 @@ mongoose
 app.use(cors());
 app.use(express.json());
 app.post("/sign-up", userController.registration);
+app.post("/login", userController.login);
 
 app.listen(port, () => {
 	console.log(`app listening on port ${port}`);
