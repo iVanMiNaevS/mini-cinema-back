@@ -1,4 +1,5 @@
 require("dotenv").config();
+const cors = require("cors");
 const userController = require("./controllers/UserController.js");
 const mongoose = require("mongoose");
 const express = require("express");
@@ -14,7 +15,9 @@ mongoose
 		console.log(err);
 	});
 
-app.get("/registration", userController.registration);
+app.use(cors());
+app.use(express.json());
+app.post("/sign-up", userController.registration);
 
 app.listen(port, () => {
 	console.log(`app listening on port ${port}`);
