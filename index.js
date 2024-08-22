@@ -3,6 +3,7 @@ const cors = require("cors");
 const userController = require("./controllers/UserController.js");
 const mongoose = require("mongoose");
 const express = require("express");
+const checkToken = require("./middleware/checkToken.js");
 const app = express();
 const port = process.env.PORT;
 
@@ -19,6 +20,8 @@ app.use(cors());
 app.use(express.json());
 app.post("/sign-up", userController.registration);
 app.post("/login", userController.login);
+app.get("/get-avatar", checkToken, userController.getAvatar);
+app.post("/add-film", checkToken, userController.addFilm);
 
 app.listen(port, () => {
 	console.log(`app listening on port ${port}`);
