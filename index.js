@@ -4,6 +4,7 @@ const userController = require("./controllers/UserController.js");
 const mongoose = require("mongoose");
 const express = require("express");
 const checkToken = require("./middleware/checkToken.js");
+const checkRefreshToken = require("./middleware/checkRefreshToken.js");
 const app = express();
 const port = process.env.PORT;
 
@@ -18,10 +19,28 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
+app.get("/get-avatar", checkToken, userController.getAvatar);
+app.get("/list-film", checkToken, userController.getListFilm);
 app.post("/sign-up", userController.registration);
 app.post("/login", userController.login);
-app.get("/get-avatar", checkToken, userController.getAvatar);
 app.post("/add-film", checkToken, userController.addFilm);
+// app.post("/refresh", checkRefreshToken, (req, res) => {
+// 	const tokenAccess = jwt.sign(
+// 		{id: req.token.id, avatar: req.token.avatar},
+// 		process.env.SECRETACCESS,
+// 		{
+// 			expiresIn: "24h",
+// 		}
+// 	);
+// 	const tokenRefresh = jwt.sign(
+// 		{id: req.token.id, avatar: req.token.avatar},
+// 		process.env.SECRETREFRESH,
+// 		{
+// 			expiresIn: "3d",
+// 		}
+// 	);
+// 	res.status(200).json({tokenAccess, tokenRefresh});
+// });
 
 app.listen(port, () => {
 	console.log(`app listening on port ${port}`);

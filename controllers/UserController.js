@@ -34,17 +34,29 @@ class userController {
 				return res.status(400).json("incorrect username or password");
 			}
 
-			var token = jwt.sign({id: condidate._id, avatar: condidate.avatar}, process.env.SECRET, {
-				expiresIn: "24h",
-			});
-			res.status(200).json(token);
+			const tokenAccess = jwt.sign(
+				{id: condidate._id, avatar: condidate.avatar},
+				process.env.SECRETACCESS,
+				{
+					expiresIn: "20s",
+				}
+			);
+			// const tokenRefresh = jwt.sign(
+			// 	{id: condidate._id, avatar: condidate.avatar},
+			// 	process.env.SECRETACCESS,
+			// 	{
+			// 		expiresIn: "3d",
+			// 	}
+			// );
+			res.status(200).json({tokenAccess});
 		} catch (e) {
 			res.json(e);
 		}
 	}
 	async getAvatar(req, res) {
-		const token = req.headers.authorization.split(" ")[1];
-		const {id} = jwt.verify(token, process.env.SECRET);
+		// const token = req.headers.authorization.split(" ")[1];
+		// const {id} = jwt.verify(token, process.env.SECRET);
+		const {id} = req.token;
 		try {
 			const condidate = await User.findOne({_id: id});
 			if (!condidate) {
@@ -56,8 +68,9 @@ class userController {
 		}
 	}
 	async addFilm(req, res) {
-		const token = req.headers.authorization.split(" ")[1];
-		const {id} = jwt.verify(token, process.env.SECRET);
+		// const token = req.headers.authorization.split(" ")[1];
+		// const {id} = jwt.verify(token, process.env.SECRET);
+		const {id} = req.token;
 		const condidate = await User.findOne({_id: id});
 		const p = condidate.listFilm.filter((film) => {
 			if (film.Title === req.body.newFilm.Title) {
@@ -80,6 +93,11 @@ class userController {
 			console.log(e);
 			res.json(e);
 		}
+	}
+	async getListFilm(req, res) {
+		const {id} = req.token;
+		const condidate = await User.findOne({_id: id});
+		res.status(200).json(condidate.listFilm);
 	}
 }
 
