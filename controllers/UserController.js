@@ -38,7 +38,7 @@ class userController {
 				{id: condidate._id, avatar: condidate.avatar},
 				process.env.SECRETACCESS,
 				{
-					expiresIn: "20s",
+					expiresIn: "1h",
 				}
 			);
 			// const tokenRefresh = jwt.sign(
@@ -51,6 +51,18 @@ class userController {
 			res.status(200).json({tokenAccess});
 		} catch (e) {
 			res.json(e);
+		}
+	}
+	async getDataUser(req, res) {
+		const {id} = req.token;
+		try {
+			const condidate = await User.findOne({_id: id});
+			if (!condidate) {
+				return res.status(500).json("the user with this id was not found");
+			}
+			res.status(200).json({avatar: condidate.avatar, listFilm: condidate.listFilm});
+		} catch (error) {
+			res.json(error);
 		}
 	}
 	async getAvatar(req, res) {
@@ -78,7 +90,7 @@ class userController {
 			}
 		});
 		if (p.length !== 0) {
-			return res.status(200).json("There is already such a film");
+			return res.status(400).json("There is already such a film");
 		}
 		const prevList = condidate.listFilm;
 		const updateDocument = {
@@ -88,7 +100,8 @@ class userController {
 		};
 		try {
 			const result = await User.updateOne({_id: id}, updateDocument);
-			res.status(200).json(result);
+			const {listFilm} = await User.findOne({_id: id});
+			res.status(200).json({result, listFilm: listFilm.length});
 		} catch (e) {
 			console.log(e);
 			res.json(e);

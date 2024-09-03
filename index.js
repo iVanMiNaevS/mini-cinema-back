@@ -21,6 +21,7 @@ app.use(cors());
 app.use(express.json());
 app.get("/get-avatar", checkToken, userController.getAvatar);
 app.get("/list-film", checkToken, userController.getListFilm);
+app.get("/data-user", checkToken, userController.getDataUser);
 app.post("/sign-up", userController.registration);
 app.post("/login", userController.login);
 app.post("/add-film", checkToken, userController.addFilm);
