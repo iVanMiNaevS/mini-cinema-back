@@ -21,6 +21,10 @@ const User = new Schema({
 			Type: String,
 			Year: String,
 			imdbID: String,
+			watched: {
+				type: Boolean,
+				default: false
+			}
 		},
 	],
 });

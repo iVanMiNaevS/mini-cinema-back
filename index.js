@@ -19,12 +19,12 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
-app.get("/get-avatar", checkToken, userController.getAvatar);
-app.get("/list-film", checkToken, userController.getListFilm);
+
 app.get("/data-user", checkToken, userController.getDataUser);
 app.post("/sign-up", userController.registration);
 app.post("/login", userController.login);
 app.post("/add-film", checkToken, userController.addFilm);
+app.delete("/delete-film", checkToken, userController.deleteFilm);
 // app.post("/refresh", checkRefreshToken, (req, res) => {
 // 	const tokenAccess = jwt.sign(
 // 		{id: req.token.id, avatar: req.token.avatar},

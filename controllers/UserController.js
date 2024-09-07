@@ -5,9 +5,9 @@ var jwt = require("jsonwebtoken");
 
 class userController {
 	async registration(req, res) {
-		const {password, username} = req.body;
+		const { password, username } = req.body;
 
-		const condidate = await User.findOne({username});
+		const condidate = await User.findOne({ username });
 		if (condidate) {
 			return res.status(400).json("such a user already exists");
 		}
@@ -23,8 +23,8 @@ class userController {
 	}
 	async login(req, res) {
 		try {
-			const {password, username} = req.body;
-			const condidate = await User.findOne({username});
+			const { password, username } = req.body;
+			const condidate = await User.findOne({ username });
 			if (!condidate) {
 				return res.status(400).json("incorrect username or password");
 			}
@@ -35,7 +35,7 @@ class userController {
 			}
 
 			const tokenAccess = jwt.sign(
-				{id: condidate._id, avatar: condidate.avatar},
+				{ id: condidate._id, avatar: condidate.avatar },
 				process.env.SECRETACCESS,
 				{
 					expiresIn: "1h",
@@ -48,44 +48,31 @@ class userController {
 			// 		expiresIn: "3d",
 			// 	}
 			// );
-			res.status(200).json({tokenAccess});
+			res.status(200).json({ tokenAccess });
 		} catch (e) {
-			res.json(e);
+			res.json(e.message);
 		}
 	}
 	async getDataUser(req, res) {
-		const {id} = req.token;
+		const { id } = req.token;
 		try {
-			const condidate = await User.findOne({_id: id});
+			const condidate = await User.findOne({ _id: id });
 			if (!condidate) {
 				return res.status(500).json("the user with this id was not found");
 			}
-			res.status(200).json({avatar: condidate.avatar, listFilm: condidate.listFilm});
+			res
+				.status(200)
+				.json({ avatar: condidate.avatar, listFilm: condidate.listFilm });
 		} catch (error) {
-			res.json(error);
+			res.json(error.message);
 		}
 	}
-	async getAvatar(req, res) {
-		// const token = req.headers.authorization.split(" ")[1];
-		// const {id} = jwt.verify(token, process.env.SECRET);
-		const {id} = req.token;
-		try {
-			const condidate = await User.findOne({_id: id});
-			if (!condidate) {
-				return res.status(500).json("the user with this id was not found");
-			}
-			res.json(condidate.avatar);
-		} catch (error) {
-			res.json(error);
-		}
-	}
+
 	async addFilm(req, res) {
-		// const token = req.headers.authorization.split(" ")[1];
-		// const {id} = jwt.verify(token, process.env.SECRET);
-		const {id} = req.token;
-		const condidate = await User.findOne({_id: id});
+		const { id } = req.token;
+		const condidate = await User.findOne({ _id: id });
 		const p = condidate.listFilm.filter((film) => {
-			if (film.Title === req.body.newFilm.Title) {
+			if (film.imdbID === req.body.newFilm.imdbID) {
 				return film;
 			}
 		});
@@ -99,18 +86,37 @@ class userController {
 			},
 		};
 		try {
-			const result = await User.updateOne({_id: id}, updateDocument);
-			const {listFilm} = await User.findOne({_id: id});
-			res.status(200).json({result, listFilm: listFilm.length});
+			await User.updateOne({ _id: id }, updateDocument);
+			const { listFilm } = await User.findOne({ _id: id });
+			res.status(200).json({ listFilm });
 		} catch (e) {
-			console.log(e);
-			res.json(e);
+			res.json(e.message);
 		}
 	}
-	async getListFilm(req, res) {
-		const {id} = req.token;
-		const condidate = await User.findOne({_id: id});
-		res.status(200).json(condidate.listFilm);
+
+	async deleteFilm(req, res) {
+		const { id } = req.token;
+		const film = req.body.film;
+		if (!film) {
+			return res.status(400).json("не передан фильм");
+		}
+		try {
+			await User.updateOne(
+				{ _id: id },
+				{
+					$pull: {
+						listFilm: {
+							imdbID: film.imdbID,
+						},
+					},
+				}
+			);
+			const user = await User.findOne({ _id: id });
+
+			res.status(200).json({ listFilm: user.listFilm });
+		} catch (err) {
+			res.status(500).json(err.message);
+		}
 	}
 }
 
