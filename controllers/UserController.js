@@ -118,6 +118,35 @@ class userController {
 			res.status(500).json(err.message);
 		}
 	}
+
+	async changeWatchedFilm(req, res) {
+		const { id } = req.token;
+		const condidate = await User.findOne({ _id: id });
+		// const prevList = condidate.listFilm.filter((film) => {
+		// 	if (film.imdbID !== req.body.film.imdbID) {
+		// 		return film;
+		// 	}
+		// });
+		const prevList = condidate.listFilm;
+		const index = condidate.listFilm.findIndex(
+			(el) => el.imdbID === req.body.film.imdbID
+		);
+		const changedFilm = { ...req.body.film, watched: req.body.watched };
+		prevList[index] = changedFilm;
+		console.log(index);
+		const updateDocument = {
+			$set: {
+				listFilm: [...prevList],
+			},
+		};
+		try {
+			await User.updateOne({ _id: id }, updateDocument);
+			const { listFilm } = await User.findOne({ _id: id });
+			res.status(200).json({ listFilm });
+		} catch (e) {
+			res.json(e.message);
+		}
+	}
 }
 
 module.exports = new userController();

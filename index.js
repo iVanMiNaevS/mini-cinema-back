@@ -25,6 +25,7 @@ app.post("/sign-up", userController.registration);
 app.post("/login", userController.login);
 app.post("/add-film", checkToken, userController.addFilm);
 app.delete("/delete-film", checkToken, userController.deleteFilm);
+app.patch("/change-watched", checkToken, userController.changeWatchedFilm);
 // app.post("/refresh", checkRefreshToken, (req, res) => {
 // 	const tokenAccess = jwt.sign(
 // 		{id: req.token.id, avatar: req.token.avatar},
